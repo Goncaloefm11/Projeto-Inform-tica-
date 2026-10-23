@@ -5,46 +5,44 @@ import re
 # ==============================================================================
 
 # Regra EBNF 1: SentencaDeontica (Domínio I)
-# SujeitoAgente OperadorDeontico AcaoOperacional RecursoSistema [ ClausulaCondicional ]
 regex_deontica = re.compile(
-    r"^(?P<Sujeito>O (?:administrador|utilizador|gestor|operador|cliente)(?:\s+(?:autenticado|não autenticado|com permissão de leitura|com perfil de leitura))?)\s+"
-    r"(?P<Operador>não pode|pode|tem de)\s+"
+    r"^(?P<Sujeito>(?:O|A|Os|As|Um|Uma)?\s*(?:administrador|utilizador|operador|supervisor|cliente|gestor)(?:\s+(?:com perfil de leitura|de loja))?)\s+"
+    r"(?P<Operador>pode|não pode|tem de)\s+"
     r"(?P<Acao>eliminar|alterar|se autenticar|editar|criar|consultar|aceder|aprovar|descarregar)\b"
-    r"(?:\s+(?P<Recurso>utilizadores|um pedido|um utilizador|permissões|os dados|ao sistema|o documento|o recurso))?"
+    r"(?:\s+(?P<Recurso>(?:O|A|Os|As|Um|Uma)?\s*(?:utilizadores|dados|pedido|permissao de edicao|talao|PVP|um pedido|um utilizador|permissões|ao sistema|o documento|o recurso)))?"
     r"(?:\s+(?P<Condicao>(?:se|antes de|sem)\s+.*))?\.$", 
     re.IGNORECASE
 )
 
 # Regra EBNF 2: RegraReativa (Domínio II - Event-Condition-Action)
-# "Se" CondicaoEvento "entao" "o" "sistema" AcaoReativa [ "para" DestinatarioAlerta ]
 regex_reativa = re.compile(
     r"^Se\s+(?P<CondicaoEvento>.*?)\s+"
     r"então o sistema\s+"
     r"(?P<AcaoReativa>envia|gera|emite|sinaliza|bloqueia)\s+"
-    r"(?P<RecursoAlerta>.*?)"
-    r"(?:\s+para\s+(?P<Destinatario>o supervisor.*|a equipa.*|eu@eu\.eu))?\.$",
+    r"(?P<RecursoAlerta>um email de alerta|um email|um aviso por email)"
+    r"(?:\s+com\s+(?P<Anexo>o relatorio|os detalhes da transacao))?"
+    r"(?:\s+para\s+(?P<Destinatario>o supervisor de loja|o supervisor|a equipa de auditoria|a equipa de seguranca|eu@eu\.eu))?\.$",
     re.IGNORECASE
 )
 
 # Regra EBNF 3: ConsultaAnalitica (Domínio II - Text-to-SQL)
-# "o" "sistema" VerboConsulta RecursoAnalitico [ AgrupamentoDimensao ] [ JanelaTemporal ]
 regex_analitica = re.compile(
     r"^O sistema\s+"
     r"(?P<VerboConsulta>mostra|lista|identifica)\s+"
     r"(?P<RecursoAnalitico>.*?)"
-    r"(?:\s+por\s+(?P<Agrupamento>operador|loja|terminal|POS|cliente|método de reembolso))?"
-    r"(?:\s+(?P<Tempo>no último mês|nos últimos \d+ dias|na última semana|nos últimos \d+ meses))?\.$",
+    r"(?:\s+por\s+(?P<Agrupamento>operador|loja|terminal|POS|cliente|metodo de reembolso))?"
+    r"(?:\s+(?P<Tempo>no ultimo mes|nos ultimos \d+ dias|nos ultimos \d+ meses|na ultima semana|na mesma semana|no mesmo turno|na mesma hora))?\.$",
     re.IGNORECASE
 )
 
 # Regra EBNF 4: DiretivaVisualizacao (Domínio II - Text-to-Dashboard)
-# "o" "sistema" VerboVisualizacao EspecificacaoGrafico "com" RecursoAnalitico [ AgrupamentoDimensao ]
 regex_visualizacao = re.compile(
     r"^O sistema\s+"
     r"(?P<VerboVisualizacao>faz|cria|mostra)\s+"
-    r"(?P<Grafico>um gráfico de .*?|um mapa de calor|um histograma)\s+"
+    r"(?P<Grafico>um grafico de (?:barras|linhas|dispersao|circular|temporal)|um mapa de calor|um histograma)\s+"
     r"(?:com|do)\s+"
-    r"(?P<Recurso>.*?)\.$",
+    r"(?P<Recurso>.*?)"
+    r"(?:\s+por\s+(?P<Agrupamento>operador|loja|terminal|POS|cliente|metodo de reembolso))?\.$",
     re.IGNORECASE
 )
 
@@ -53,13 +51,7 @@ regex_visualizacao = re.compile(
 # ==============================================================================
 
 def analisar_frase(frase):
-    """
-    Testa as várias ramificações da regra principal da EBNF:
-    Regra ::= SentencaDeontica | RegraReativa | ConsultaAnalitica | DiretivaVisualizacao
-    """
     frase_limpa = frase.strip()
-    
-    # 3. GERAÇÃO DA ÁRVORE DE SINTAXE ABSTRATA (AST) Tipada
     
     m_deontica = regex_deontica.match(frase_limpa)
     if m_deontica:
@@ -93,17 +85,10 @@ def analisar_frase(frase):
 # ==============================================================================
 
 frases_teste = [
-    # Teste 1: SentencaDeontica
     "O administrador pode eliminar utilizadores.",
     "O utilizador não pode alterar um pedido sem permissão de edição.",
-    
-    # Teste 2: RegraReativa
     "Se um terminal registar mais de 3 transações rejeitadas consecutivas então o sistema envia um email para eu@eu.eu.",
-    
-    # Teste 3: ConsultaAnalitica
-    "O sistema mostra a quantidade de anulações por operador no último mês.",
-    
-    # Teste 4: DiretivaVisualizacao
+    "O sistema mostra a quantidade de anulações por operador no ultimo mes.",
     "O sistema cria um histograma do número de transações rejeitadas por POS."
 ]
 
