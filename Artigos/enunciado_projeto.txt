@@ -1,0 +1,3 @@
+Projeto em Linguagem natural controlada para Português. 
+As linguagens naturais controladas são uma forma de reduzir alucinações de LLMs e uma promessa no processo de verificação formal de programas. Este projeto pode ser desenvolvido em várias frentes: Para alguém interessado na área Processamento de Linguagem Natural focar-se-à no desenvolvimento da linguagem natural controlada para Português. Para alguém interessado em métodos formais o foco será a autoformalizacão. Para alguém interessado em theorem proving e formalização matemática o foco poderá ser a ponte entre teoria de tipos e provas informais. 
+Resultado: Technical Report
