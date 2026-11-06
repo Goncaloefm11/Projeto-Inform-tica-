@@ -111,7 +111,7 @@ frases = [
     "O sistema deve mandar o relatório.",
     
     # Testa Deteção de Entidades (Valores, Dinheiro, Datas)
-    "O gestor pode aprovar devoluções se forem superiores a 150 euros na próxima semana."
+    "O gestor pode aprovar devoluções superiores a 150 euros na próxima semana."
 ]
 
 print("======================================================")
